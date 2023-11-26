@@ -1,7 +1,9 @@
 import csv
 import random
+import os
 
 def display_inventory(filename):
+    item_number = 1
     try:
         with open(filename, 'r') as file:
             reader = csv.reader(file)
@@ -11,9 +13,56 @@ def display_inventory(filename):
                     remove_apostrophe=original_item.replace("'","")
                     remove_bracket=remove_apostrophe.replace("[","")
                     edited_item=remove_bracket.replace("]","")
-                    print(f"{edited_item} - {tier} Tier")
+                    print(f"{item_number}. {edited_item} - {tier} Tier")
+                    item_number += 1
     except FileNotFoundError:
-        print("Invalid input. Please try again")
+        print("Your inventory is empty. Pull for some items!")
+
+def rare_pity(filename):
+    # Items in tiers
+    rare_items = ["Iron Sword", "Iron Axe", "Crossbow"]
+    # Pick an item from tiers
+    rare_tier = random.choice(rare_items)
+    # Pick rare tier
+    random_tier = [rare_tier]
+    # Remove [ ] '
+    original_message=str(random_tier)
+    remove_apostrophe=original_message.replace("'","")
+    remove_bracket=remove_apostrophe.replace("[","")
+    new_message=remove_bracket.replace("]","")
+    # Identify rare rarity
+    if new_message in rare_items:
+        rarity = "Rare"
+    else:
+        rarity = "Null"
+    # Add item to inventory, say rarity + new item
+    with open(filename, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([rarity, random.choices(random_tier)])
+        print(f"You got a {rarity} {new_message}!")
+
+def legendary_pity(filename):
+    # Items in tiers
+    legendary_items = ["Diamond Sword", "Diamond Axe", "Spellbook"]
+    # Pick an item from tiers
+    legendary_tier = random.choice(legendary_items)
+    # Pick legendary tier
+    random_tier = [legendary_tier]
+    # Remove [ ] '
+    original_message=str(random_tier)
+    remove_apostrophe=original_message.replace("'","")
+    remove_bracket=remove_apostrophe.replace("[","")
+    new_message=remove_bracket.replace("]","")
+    # Identify legendary rarity
+    if new_message in legendary_items:
+        rarity = "Legendary"
+    else:
+        rarity = "Null"
+    # Add item to inventory, say rarity + new item
+    with open(filename, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([rarity, random.choices(random_tier)])
+        print(f"You got a {rarity} {new_message}!")
 
 def pull_item(filename):
     # Items in tiers
@@ -26,7 +75,7 @@ def pull_item(filename):
     legendary_tier = random.choice(legendary_items)
     # Pick a random tier
     random_tier = [common_tier, rare_tier, legendary_tier]
-    random_item = random.choices(random_tier, weights=(90, 10, 1))
+    random_item = random.choices(random_tier, weights=(100, 0, 0))
     # Remove [ ] '
     original_message=str(random_item)
     remove_apostrophe=original_message.replace("'","")
@@ -48,8 +97,33 @@ def pull_item(filename):
         print(f"You got a {rarity} {new_message}!")
 
 def main():
+    print()  # Blank line for cleanliness
     print("Welcome to Mason's Gacha Game!")
+    print("I will guarantee that you get a rare item within 10 pulls" +
+          " and a legendary item within 100 pulls.")
     filename = 'inventory.csv'
+
+    rare_count = 0
+    legendary_count = 0
+    # Pity system
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+                reader = csv.reader(file)
+                for line in reader:
+                    if len(line)==2:
+                        tier, original_item=line
+                        if tier == "Common":
+                            rare_count += 1
+                            legendary_count += 1
+                        if tier == "Rare":
+                            rare_count = 0
+                            legendary_count += 1
+                        if tier == "Legendary":
+                            rare_count += 1
+                            legendary_count = 0
+    else:
+        print("Your inventory is empty. Pull for some items!")
+
     prompt_msg = ("Enter 'd' / 'display' to display items, 'p' / 'pull' to " +
                   "pull for items, or 'q' / 'quit' to quit: ")
     while True:
@@ -62,10 +136,24 @@ def main():
             if pull_amount == 1 or pull_amount == 5 or pull_amount == 10: # Pull X amount of times
                 counter = 0
                 while counter < pull_amount:
-                    pull_item(filename)
-                    counter += 1
+                    if legendary_count == 99:
+                        legendary_pity(filename)
+                        counter += 1
+                        rare_count = 0
+                        legendary_count = 0
+                    else:
+                        if rare_count == 9:
+                            rare_pity(filename)
+                            counter += 1
+                            rare_count = 0
+                            legendary_count += 1
+                        else:
+                            pull_item(filename)
+                            counter += 1
+                            rare_count += 1
+                            legendary_count += 1
             else:
-                print("Invalid input. Please try again")
+                print("Please enter '1', '5', or '10' to pull for items.")
         elif choice == "q" or choice == "quit": # Quit program
             break
         else:
