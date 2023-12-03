@@ -1,0 +1,7 @@
+Libraries needed to run the PFDA Gacha Game
+
+import csv
+import random
+import os
+from moviepy.editor import *
+import pygame
