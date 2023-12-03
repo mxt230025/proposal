@@ -1,8 +1,12 @@
-# Gacha Game System
+# PFDA Gacha Game System
 
 ## Repository
 Link to my project's public GitHub respository:
 https://github.com/mxt230025/proposal.git
+
+## Video
+Link to my project's unlisted YouTube video:
+https://youtu.be/Jxr3zvYGfQs
 
 ## Description
 When you spend a pull you can get an item of varying rarities. This can be a game or utilized as a basic system used by other games that wish to use a gacha system.
